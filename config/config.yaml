@@ -1,0 +1,14 @@
+# MySQL数据库配置
+database:
+  host: "localhost"
+  port: 3306
+  username: "root"
+  password: "HelloWorld"
+  database: "emaction"
+  charset: "utf8mb4"
+
+# 跨域
+cors:
+  allowOrigins: ["*"]
+  allowMethods: ["GET", "PATCH", "OPTIONS"]
+  allowHeaders: ["Content-Type", "Authorization"]
