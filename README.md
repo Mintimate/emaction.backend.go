@@ -17,6 +17,21 @@ Emaction 的 Go 语言版本后端服务，提供 emoji reaction 统计功能。
 
 ## 🚀 快速开始
 
+你可以使用 Docker 快速启动:
+
+```bash
+docker run --name emaction -p 8080:8080 -d docker.cnb.cool/mintimate/code-nest/emaction.backend.go
+```
+
+默认情况使用 SQLite。
+
+如果你希望修改默认配置，可以进行映射：
+
+```bash
+docker run --name emaction -p 8080:8080 -v ./config:/app/config -d docker.cnb.cool/mintimate/code-nest/emaction.backend.go
+```
+
+## 🔨 源码定制
 ### 前置要求
 
 - Go 1.21 或更高版本
