@@ -10,7 +10,7 @@ Emaction 的 Go 语言版本后端服务，提供 emoji reaction 统计功能。
 
 - ✨ **Emoji Reaction 统计** - 记录和统计各种 emoji reaction 的点击次数
 - 🔥 **高性能** - 基于 Go 和 Gin 框架，提供优秀的并发性能
-- 🗄️ **MySQL 数据库** - 使用 GORM 进行数据持久化
+- 🗄️ **MySQL/Sqlite 数据库** - 使用 GORM 进行数据持久化
 - 🌐 **CORS 支持** - 内置跨域资源共享配置
 - 📊 **RESTful API** - 简洁易用的 API 接口设计
 - ⚡ **快速部署** - 支持一键 Docker 部署
@@ -39,16 +39,27 @@ Emaction 的 Go 语言版本后端服务，提供 emoji reaction 统计功能。
    
    修改 `config/config.yaml` 文件：
    ```yaml
+   # 数据库配置(支持mysql和sqlite)
    database:
-     host: "localhost"
-     port: 3306
-     username: "your_username"
-     password: "your_password"
-     database: "emaction"
-     charset: "utf8mb4"
+    # 支持mysql或sqlite
+    type: "sqlite"
+    # MySQL情况下数据库地址
+    host: "localhost"
+    # MySQL情况下数据库端口
+    port: 3306
+    # MySQL情况下数据库用户名
+    username: "root"
+    # MySQL情况下数据库密码
+    password: "HelloWorld"
+    # MySQL情况下数据库名
+    database: "emaction"
+    # MySQL情况下数据库编码
+    charset: "utf8mb4"
+    # SQLite情况下数据库路径
+    sqlite_path: "./emaction.db"
    ```
 
-4. **初始化数据库**
+4. **[MySQL] 初始化数据库**
    ```bash
    mysql -u your_username -p < scripts/init.sql
    ```
