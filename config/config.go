@@ -16,12 +16,14 @@ type Config struct {
 
 // DatabaseConfig 数据库配置
 type DatabaseConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
-	Database string `yaml:"database"`
-	Charset  string `yaml:"charset"`
+	Type       string `yaml:"type"` // mysql or sqlite
+	Host       string `yaml:"host"`
+	Port       int    `yaml:"port"`
+	Username   string `yaml:"username"`
+	Password   string `yaml:"password"`
+	Database   string `yaml:"database"`
+	Charset    string `yaml:"charset"`
+	SQLitePath string `yaml:"sqlite_path"`
 }
 
 // ServerConfig 服务器配置

@@ -1,11 +1,21 @@
-# MySQL数据库配置
+# 数据库配置(支持mysql和sqlite)
 database:
+  # 支持mysql或sqlite
+  type: "mysql"
+  # MySQL情况下数据库地址
   host: "localhost"
+  # MySQL情况下数据库端口
   port: 3306
+  # MySQL情况下数据库用户名
   username: "root"
+  # MySQL情况下数据库密码
   password: "HelloWorld"
+  # MySQL情况下数据库名
   database: "emaction"
+  # MySQL情况下数据库编码
   charset: "utf8mb4"
+  # SQLite情况下数据库路径
+  sqlite_path: "./data.db"
 
 # 跨域
 cors:
