@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	"emaction/config"
@@ -14,37 +15,40 @@ import (
 	"gorm.io/gorm"
 )
 
-// loadConfig 加载配置
-func loadConfig() config.Config {
-	configPath := os.Getenv("APP_CONFIG_PATH")
-	if configPath == "" {
-		configPath = "./config" // 默认当前目录
-	}
-	// 加载配置
-	cfg, err := config.LoadConfig(configPath)
-	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
-	}
-	return cfg
+var (
+	dbInitOnce sync.Once
+	dbInstance *gorm.DB
+)
+
+// initDatabase 初始化数据库连接（单例模式）
+func initDatabase() *gorm.DB {
+	dbInitOnce.Do(func() {
+		configPath := os.Getenv("APP_CONFIG_PATH")
+		if configPath == "" {
+			configPath = "./config" // 默认当前目录
+		}
+		// 加载配置
+		cfg, err := config.LoadConfig(configPath)
+		if err != nil {
+			log.Fatalf("Failed to load config: %v", err)
+		}
+
+		// 初始化数据库连接
+		dbInstance, err = database.InitDB(cfg.Database)
+		if err != nil {
+			log.Fatalf("Failed to connect database: %v", err)
+		}
+	})
+	return dbInstance
 }
 
 // GetReactions 获取指定目标的所有 Emoji
 func GetReactions(targetID string) ([]model.ReactionResponse, error) {
-	cfg := loadConfig()
-
-	// 初始化数据库连接
-	db, err := database.InitDB(cfg.Database)
-	if err != nil {
-		log.Fatalf("Failed to connect database: %v", err)
-	}
-	defer func() {
-		if err := database.CloseDB(); err != nil {
-			log.Printf("Failed to close database: %v", err)
-		}
-	}()
+	// 获取共享的数据库连接
+	db := initDatabase()
 
 	var reactions []model.Reaction
-	err = db.Where("target_id = ?", targetID).Find(&reactions).Error
+	err := db.Where("target_id = ?", targetID).Find(&reactions).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to query reactions: %w", err)
 	}
@@ -63,8 +67,6 @@ func GetReactions(targetID string) ([]model.ReactionResponse, error) {
 
 // UpdateReaction 更新 Emoji 计数
 func UpdateReaction(targetID, reactionName string, diff int) error {
-	cfg := loadConfig()
-
 	// 标准化 diff 值
 	if diff > 0 {
 		diff = 1
@@ -74,19 +76,11 @@ func UpdateReaction(targetID, reactionName string, diff int) error {
 		return errors.New("invalid diff value")
 	}
 
-	// 初始化数据库连接
-	db, err := database.InitDB(cfg.Database)
-	if err != nil {
-		log.Fatalf("Failed to connect database: %v", err)
-	}
-	defer func() {
-		if err := database.CloseDB(); err != nil {
-			log.Printf("Failed to close database: %v", err)
-		}
-	}()
+	// 获取共享的数据库连接
+	db := initDatabase()
 
 	var reaction model.Reaction
-	err = db.Where("target_id = ? AND reaction_name = ?", targetID, reactionName).First(&reaction).Error
+	err := db.Where("target_id = ? AND reaction_name = ?", targetID, reactionName).First(&reaction).Error
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
