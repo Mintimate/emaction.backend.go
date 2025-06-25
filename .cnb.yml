@@ -10,20 +10,21 @@ $:
       stages:
         - name: 初始化完成
           script: echo "初始化完成"
-  push:
-    - name: 推送镜像
-      imports:
-        - https://cnb.cool/Mintimate/secret/-/blob/main/SyncToGitHub.yml
-      stages:
-        - name: 自动同步代码
-          image: tencentcom/git-sync
-          settings:
-            target_url: https://github.com/Mintimate/emaction.backend.go.git
-            auth_type: https
-            username: ${GIT_USERNAME}
-            password: ${GIT_ACCESS_TOKEN}
-            branch: main
-            force: true
+
+.sync_push: &sync_push
+    name: 推送镜像
+    imports:
+      - https://cnb.cool/Mintimate/secret/-/blob/main/SyncToGitHub.yml
+    stages:
+      - name: 自动同步代码
+        image: tencentcom/git-sync
+        settings:
+          target_url: https://github.com/Mintimate/emaction.backend.go.git
+          auth_type: https
+          username: ${GIT_USERNAME}
+          password: ${GIT_ACCESS_TOKEN}
+          branch: main
+          force: true
 
 # WebIDE 修改不出发流水线
 .skip_project: &skip_project
@@ -32,6 +33,7 @@ $:
     - "!(.ide/**)"
 main:
   push:
+    - <<: *sync_push
     - name: "构建 AMD64 架构镜像"
       runner:
         tags: cnb:arch:amd64
