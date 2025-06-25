@@ -1,9 +1,11 @@
 #!/bin/sh
 
-# 检查配置文件目录是否存在，如果不存在则创建
+set -e
+
+# 确保配置目录存在
 if [ ! -d "/app/config" ]; then
+  echo "Creating config directory..."
   mkdir -p /app/config
-  echo "Created config directory"
 fi
 
 # 检查配置文件是否存在，如果不存在则创建默认配置

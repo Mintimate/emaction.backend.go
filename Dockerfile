@@ -26,9 +26,6 @@ FROM alpine:latest
 RUN apk add --no-cache ca-certificates && \
     rm -rf /var/cache/apk/*
 
-# 创建非 root 用户
-RUN adduser -D -g '' emaction
-
 WORKDIR /app
 
 # 从构建阶段复制二进制文件
@@ -40,12 +37,6 @@ RUN mkdir -p ./config
 
 # 给予启动脚本执行权限
 RUN chmod +x ./entrypoint.sh
-
-# 将所有文件的所有者更改为 appuser
-RUN chown -R emaction:emaction /app
-
-# 切换到非 root 用户
-USER emaction
 
 # 暴露端口
 EXPOSE 8080
